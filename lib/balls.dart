@@ -9,6 +9,22 @@ class Ball extends SpriteComponent with KeyboardHandler {
   static const double _speed = 250.0;
   static const double _friction = 0.9;
 
+  String _colFile = 'balle_bleue.png';
+
+  Ball(String col) {
+    switch (col) {
+      case 'rd':
+        _colFile = 'balle_rouge.png';
+        break;
+      case 'yl':
+        _colFile = 'balle_jaune.png';
+        break;
+      case 'gr':
+        _colFile = 'balle_verte.png';
+        break;
+    }
+  }
+
   Vector2 _movementVector = Vector2.zero();
 
   bool _isPressingLeft = false;
@@ -19,7 +35,7 @@ class Ball extends SpriteComponent with KeyboardHandler {
   @override
   Future<void> onLoad() async {
     size = Vector2(_size, _size);
-    sprite = await Sprite.load('balle_bleue.png');
+    sprite = await Sprite.load(_colFile);
   }
 
   @override
@@ -94,7 +110,7 @@ class BallsGame extends FlameGame with HasKeyboardHandlerComponents {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    _ball = Ball();
+    _ball = Ball('gr');
     await add(_ball);
   }
 }
