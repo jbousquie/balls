@@ -28,5 +28,11 @@ flutter:
 
 
   uses-material-design: true
+  assets:
+    - assets/images/balle_bleue.png
+    - assets/images/balle_jaune.png
+    - assets/images/balle_rouge.png
+    - assets/images/balle_verte.png
+
 
 
