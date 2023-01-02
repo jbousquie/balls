@@ -1,15 +1,17 @@
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame/input.dart';
-import 'package:flame/game.dart';
-import 'package:flutter/services.dart';
+import 'dart:math';
 
-class Ball extends SpriteComponent with KeyboardHandler {
+import 'package:flame/game.dart';
+
+class Ball extends SpriteComponent
+    with HasGameRef<FlameGame>, CollisionCallbacks {
   static const _size = 32.0;
 
   static const double _speed = 250.0;
-  static const double _friction = 0.9;
 
   String _colFile = 'balle_bleue.png';
+  final Vector2 _velocity = Vector2.zero();
 
   Ball(String col) {
     switch (col) {
@@ -25,15 +27,16 @@ class Ball extends SpriteComponent with KeyboardHandler {
     }
   }
 
-  Vector2 _movementVector = Vector2.zero();
-
-  bool _isPressingLeft = false;
-  bool _isPressingRight = false;
-  bool _isPressingUp = false;
-  bool _isPressingDown = false;
+  void get _resetBall {
+    _velocity.x = Random().nextDouble() * _speed;
+    _velocity.y = Random().nextDouble() * _speed;
+    position.x = Random().nextDouble() * gameRef.size.x;
+    position.y = Random().nextDouble() * gameRef.size.y;
+  }
 
   @override
   Future<void> onLoad() async {
+    _resetBall;
     size = Vector2(_size, _size);
     sprite = await Sprite.load(_colFile);
   }
@@ -42,75 +45,6 @@ class Ball extends SpriteComponent with KeyboardHandler {
   void update(double dt) {
     super.update(dt);
 
-    final Vector2 inputVector = Vector2.zero();
-
-    if (_isPressingLeft) {
-      inputVector.x -= 1.0;
-    } else if (_isPressingRight) {
-      inputVector.x += 1.0;
-    }
-
-    if (_isPressingUp) {
-      inputVector.y -= 1.0;
-    } else if (_isPressingDown) {
-      inputVector.y += 1.0;
-    }
-
-    if (!inputVector.isZero()) {
-      _movementVector = inputVector;
-      _movementVector.normalize();
-      _movementVector *= _speed * dt;
-    } else {
-      _movementVector *= _friction;
-    }
-    position += _movementVector;
-  }
-
-  @override
-  bool onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
-    final isKeyDown = event is RawKeyDownEvent;
-    final isKeyUp = event is RawKeyUpEvent;
-
-    if (isKeyUp) {
-      final logicalKey = event.data.logicalKey;
-      if (logicalKey == LogicalKeyboardKey.arrowLeft) {
-        _isPressingLeft = false;
-      } else if (logicalKey == LogicalKeyboardKey.arrowRight) {
-        _isPressingRight = false;
-      } else if (logicalKey == LogicalKeyboardKey.arrowDown) {
-        _isPressingDown = false;
-      } else if (logicalKey == LogicalKeyboardKey.arrowUp) {
-        _isPressingUp = false;
-      }
-    }
-
-    if (isKeyDown) {
-      if (keysPressed.contains(LogicalKeyboardKey.arrowLeft)) {
-        _isPressingLeft = true;
-      } else if (keysPressed.contains(LogicalKeyboardKey.arrowRight)) {
-        _isPressingRight = true;
-      }
-      if (keysPressed.contains(LogicalKeyboardKey.arrowUp)) {
-        _isPressingUp = true;
-      } else if (keysPressed.contains(LogicalKeyboardKey.arrowDown)) {
-        _isPressingDown = true;
-      }
-    }
-
-    return true;
-  }
-}
-
-class BallsGame extends FlameGame with HasKeyboardHandlerComponents {
-  late final Ball _ball;
-
-  @override
-  Color backgroundColor() => const Color(0xFF353935);
-
-  @override
-  Future<void> onLoad() async {
-    await super.onLoad();
-    _ball = Ball('gr');
-    await add(_ball);
+    position += _velocity * dt;
   }
 }
