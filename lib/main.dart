@@ -13,11 +13,11 @@ void main() {
 }
 
 class BallsGame extends FlameGame with HasCollisionDetection {
-  int max = 10;
+  int max = 30;
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    add(ScreenHitbox());
+    //add(ScreenHitbox());
     List<Ball> balls = [];
     for (var i = 0; i < max; i++) {
       balls.add(Ball('rd'));

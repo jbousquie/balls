@@ -8,7 +8,7 @@ import 'package:flame/game.dart';
 
 class Ball extends SpriteComponent
     with HasGameRef<FlameGame>, CollisionCallbacks {
-  static const _size = 32.0;
+  static const _size = 24.0;
 
   static const double _speed = 150.0;
 
