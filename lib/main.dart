@@ -1,4 +1,4 @@
-import 'package:flame/collisions.dart';
+import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 
@@ -13,16 +13,19 @@ void main() {
 }
 
 class BallsGame extends FlameGame with HasCollisionDetection {
-  late final Ball _ball;
-
-  @override
-  Color backgroundColor() => const Color(0xFF353935);
-
+  int max = 20;
   @override
   Future<void> onLoad() async {
-    //await super.onLoad();
-    _ball = Ball('yl');
+    await super.onLoad();
     add(ScreenHitbox());
-    await add(_ball);
+    List<Ball> balls = [];
+    for (var i = 0; i < max; i++) {
+      balls.add(Ball('rd'));
+      balls.add(Ball('gr'));
+      balls.add(Ball('yl'));
+      balls.add(Ball('bl'));
+    }
+    await addAll(balls);
+    add(FpsTextComponent());
   }
 }
