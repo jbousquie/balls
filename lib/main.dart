@@ -13,7 +13,7 @@ void main() {
 }
 
 class BallsGame extends FlameGame with HasCollisionDetection {
-  int max = 20;
+  int max = 10;
   @override
   Future<void> onLoad() async {
     await super.onLoad();

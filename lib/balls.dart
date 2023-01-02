@@ -13,7 +13,7 @@ class Ball extends SpriteComponent
   static const double _speed = 150.0;
 
   String _colFile = 'balle_bleue.png';
-  final Vector2 _velocity = Vector2.zero();
+  final Vector2 velocity = Vector2.zero();
 
   Ball(String col) {
     switch (col) {
@@ -30,12 +30,14 @@ class Ball extends SpriteComponent
   }
 
   void get _resetBall {
-    _velocity.x = Random().nextDouble() * _speed + _speed * 0.5;
-    _velocity.y = Random().nextDouble() * _speed + _speed * 0.5;
+    double sign = Random().nextBool() ? 1.0 : -1.0;
+    velocity.x = sign * (Random().nextDouble() * _speed + _speed * 0.5);
+    sign = Random().nextBool() ? 1.0 : -1.0;
+    velocity.y = sign * (Random().nextDouble() * _speed + _speed * 0.5);
     position.x =
-        Random().nextDouble() * gameRef.size.x * 0.5 + gameRef.size.x * 0.25;
+        Random().nextDouble() * gameRef.size.x * 0.75 + gameRef.size.x * 0.25;
     position.y =
-        Random().nextDouble() * gameRef.size.y * 0.5 + gameRef.size.y * 0.25;
+        Random().nextDouble() * gameRef.size.y * 0.75 + gameRef.size.y * 0.25;
   }
 
   @override
@@ -51,25 +53,38 @@ class Ball extends SpriteComponent
   @override
   void update(double dt) {
     super.update(dt);
-    position += _velocity * dt;
+    final Vector2 gameSize = gameRef.size;
+    if (position.x < 0) {
+      position.x = 0;
+      velocity.x = -velocity.x;
+    } else if (position.x > gameSize.x - _size) {
+      position.x = gameSize.x - _size;
+      velocity.x = -velocity.x;
+    }
+    if (position.y < 0) {
+      position.y = 0;
+      velocity.y = -velocity.y;
+    } else if (position.y > gameSize.y - _size) {
+      position.y = gameSize.y - _size;
+      velocity.y = -velocity.y;
+    }
+    position += velocity * dt;
   }
 
   @override
-  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    super.onCollision(intersectionPoints, other);
+  void onCollisionStart(
+      Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollisionStart(intersectionPoints, other);
     final collisionPoint = intersectionPoints.first;
 
-    if (other is ScreenHitbox) {
-      if (collisionPoint.x == 0 || collisionPoint.x == gameRef.size.x) {
-        _velocity.x = -_velocity.x;
-      }
-      if (collisionPoint.y == 0 || collisionPoint.y == gameRef.size.y) {
-        _velocity.y = -_velocity.y;
-      }
-    }
     if (other is Ball) {
-      _velocity.x = -_velocity.x;
-      _velocity.y = -_velocity.y;
+      if ((collisionPoint.y <= position.y + _size && velocity.y > 0) ||
+          (collisionPoint.y >= position.y - _size && velocity.y < 0)) {
+        velocity.y = -velocity.y;
+      } else if ((collisionPoint.x <= position.x + _size && velocity.x > 0) ||
+          (collisionPoint.x >= position.x - _size && velocity.x < 0)) {
+        velocity.x = -velocity.x;
+      }
     }
   }
 }
